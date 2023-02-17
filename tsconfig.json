@@ -1,0 +1,35 @@
+{
+  "compilerOptions": {
+    // 允许从没有设置默认导出的模块中默认导入。这并不影响代码的输出，仅为了类型检查
+    "allowSyntheticDefaultImports": true,
+    // 生成相应的.map文件
+    "sourceMap": true,
+    // 在表达式和声明上有隐含的 any类型时报错
+    "noImplicitAny": false,
+    // 模块引入方式
+    "module": "ESNext",
+    // 指定ECMAScript目标版本
+    "target": "es5",
+    // 决定如何处理模块
+    "moduleResolution": "node",
+    // 编译过程中需要引入的库文件的列表
+    "lib": ["esnext", "dom"],
+    // 允许js文件
+    "allowJs": true,
+    // 检查js
+    "checkJs": true,
+    // 忽略所有库中的声明文件（ *.d.ts）的类型检查。
+    "skipLibCheck": true,
+    "rootDir": "src",
+    "strict": true
+  },
+  "exclude": [
+    "node_modules",
+    "config",
+    "**/mock",
+    "build",
+    "**/dist",
+    "./env",
+    "**/*.js"
+  ]
+}
