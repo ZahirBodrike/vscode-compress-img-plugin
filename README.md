@@ -2,11 +2,9 @@
 
 vscode version: `1.75.0`以上
 
-开发指引：
+**开发指引**：
 
-![vscode插件开发指引](./vsc-extension-quickstart.md)
-
-**TS 开发**
+_TS 开发_
 
 调试：vscode 按 F5
 
