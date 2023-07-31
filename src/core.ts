@@ -24,7 +24,7 @@ function RandomHeader() {
     },
     hostname: TINYIMG_URL[index],
     method: "POST",
-    path: "/web/shrink",
+    path: "/backend/opt/shrink",
     rejectUnauthorized: false,
   };
 }

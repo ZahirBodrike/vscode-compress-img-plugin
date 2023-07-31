@@ -1,6 +1,7 @@
 {
-  "name": "ieg-vscode-plugin",
-  "displayName": "ieg-vscode-plugin",
+  "name": "opd-vscode-plugin",
+  "displayName": "opd-vscode-plugin",
+  "icon": "https://16163.com/favicon.ico",
   "description": "",
   "publisher": "zhangbin",
   "version": "1.0.0",
@@ -11,21 +12,21 @@
     "Other"
   ],
   "activationEvents": [
-    "onCommand:ieg-vscode-plugin.helloWorld"
+    "onCommand:opd-vscode-plugin.helloWorld"
   ],
   "main": "./dist/extension.js",
   "contributes": {
     "commands": [
       {
-        "command": "ieg-vscode-plugin.compress",
-        "title": "lz - 压缩图片"
+        "command": "opd-vscode-plugin.compress",
+        "title": "opd - 压缩图片"
       }
     ],
     "menus": {
       "explorer/context": [
         {
-          "command": "ieg-vscode-plugin.compress",
-          "group": "lz-utils"
+          "command": "opd-vscode-plugin.compress",
+          "group": "opd-utils"
         }
       ]
     }

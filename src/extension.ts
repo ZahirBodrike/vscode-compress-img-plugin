@@ -6,7 +6,7 @@ import { isImgFile } from "./util/tool";
 export function activate(context: vscode.ExtensionContext) {
   try {
     let disposable = vscode.commands.registerCommand(
-      "ieg-vscode-plugin.compress",
+      "opd-vscode-plugin.compress",
       (e) => {
         const targetFilePath = e.path;
         console.log("current file: ", targetFilePath);
