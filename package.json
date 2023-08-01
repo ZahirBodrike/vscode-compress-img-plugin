@@ -1,6 +1,6 @@
 {
-  "name": "ieg-vscode-plugin",
-  "displayName": "ieg-vscode-plugin",
+  "name": "ieg-vscode-compress-plugin",
+  "displayName": "ieg-vscode-compress-plugin",
   "icon": "favicon.ico",
   "description": "",
   "publisher": "zhangbin",
@@ -12,20 +12,28 @@
     "Other"
   ],
   "activationEvents": [
-    "onCommand:ieg-vscode-plugin.helloWorld"
+    "onCommand:ieg-vscode-compress-plugin.helloWorld"
   ],
   "main": "./dist/extension.js",
   "contributes": {
     "commands": [
       {
-        "command": "ieg-vscode-plugin.compress",
-        "title": "ieg - 压缩图片"
+        "command": "ieg-vscode-compress-plugin.compressAndCover",
+        "title": "ieg - 压缩图片(覆盖原文件)"
+      },
+      {
+        "command": "ieg-vscode-compress-plugin.compressAndCreate",
+        "title": "ieg - 压缩图片(保留原文件)"
       }
     ],
     "menus": {
       "explorer/context": [
         {
-          "command": "ieg-vscode-plugin.compress",
+          "command": "ieg-vscode-compress-plugin.compressAndCover",
+          "group": "ieg-utils"
+        },
+        {
+          "command": "ieg-vscode-compress-plugin.compressAndCreate",
           "group": "ieg-utils"
         }
       ]

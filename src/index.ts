@@ -3,7 +3,12 @@ import * as vscode from "vscode";
 import core from "./core";
 import { ByteSize, RoundNum, isImgFile } from "./util/tool";
 
-async function compressImg(imageUrl) {
+enum ECompressType {
+  Cover,
+  Create,
+}
+
+async function compressImg(imageUrl: string, type: ECompressType) {
   try {
     const file = await fs.readFile(`${imageUrl}`);
     const obj: any = await core.uploadImg(file);
@@ -11,7 +16,16 @@ async function compressImg(imageUrl) {
     const oldSize = obj.input.size;
     const newSize = obj.output.size;
     const ratio = RoundNum(1 - obj.output.ratio, 2, true);
-    fs.writeFileSync(`${imageUrl}`, data, "binary");
+    if (type === ECompressType.Cover) {
+      fs.writeFileSync(`${imageUrl}`, data, "binary");
+    } else if (type === ECompressType.Create) {
+      const now = Date.now();
+      const oldImgName = imageUrl.replace(".", `_old_${now}.`);
+      fs.rename(imageUrl, oldImgName).then(() => {
+        fs.writeFileSync(`${imageUrl}`, data, "binary");
+      });
+    }
+
     return {
       type: "success",
       imageUrl,
@@ -25,7 +39,11 @@ async function compressImg(imageUrl) {
   }
 }
 
-const compressImgList = async (files: string[], filePath) => {
+const compressImgList = async (
+  files: string[],
+  filePath,
+  compressType: ECompressType
+) => {
   // 只过滤img
   try {
     const beforeCompressImages = files.filter((file) => isImgFile(file));
@@ -37,7 +55,8 @@ const compressImgList = async (files: string[], filePath) => {
     let totalNewSize = 0;
     for (let index = 0; index < beforeCompressImages.length; index++) {
       const { type, oldSize, newSize } = await compressImg(
-        `${filePath}/${beforeCompressImages[index]}`
+        `${filePath}/${beforeCompressImages[index]}`,
+        compressType
       );
       if (type === "success") {
         totalOldSize += oldSize;
@@ -64,8 +83,20 @@ const compressImgList = async (files: string[], filePath) => {
   }
 };
 
-export const disposable = vscode.commands.registerCommand(
-  "ieg-vscode-plugin.compress",
+const messageShower = ({ type, imageUrl, oldSize, newSize, ratio, err }) => {
+  if (type === "success") {
+    const msg = `Compressed [${imageUrl}] completed: Old Size ${ByteSize(
+      oldSize
+    )}, New Size ${ByteSize(newSize)}, Optimization Ratio ${ratio}`;
+    vscode.window.showInformationMessage(msg);
+  } else {
+    const msg = `Compressed [${imageUrl}] failed: ${err}`;
+    vscode.window.showErrorMessage(msg);
+  }
+};
+
+export const compressAndCoverDisposable = vscode.commands.registerCommand(
+  "ieg-vscode-compress-plugin.compressAndCover",
   (e) => {
     const targetFilePath = e.path;
     fs.ensureDir(targetFilePath)
@@ -75,21 +106,18 @@ export const disposable = vscode.commands.registerCommand(
             vscode.window.showInformationMessage(
               `Compressing... dir: ${targetFilePath}`
             );
-            compressImgList(data, targetFilePath).then((result) => {
-              if (result?.type === "success") {
-                const msg = `Compressed [${
-                  result?.imageUrl
-                }] completed: Old Size ${ByteSize(
-                  result?.oldSize
-                )}, New Size ${ByteSize(result?.newSize)}, Optimization Ratio ${
-                  result?.ratio
-                }`;
-                vscode.window.showInformationMessage(msg);
-              } else {
-                const msg = `Compressed [${result?.imageUrl}] failed: ${result?.err}`;
-                vscode.window.showErrorMessage(msg);
+            compressImgList(data, targetFilePath, ECompressType.Cover).then(
+              (result) => {
+                messageShower({
+                  type: result?.type,
+                  imageUrl: result?.imageUrl,
+                  oldSize: result?.oldSize,
+                  newSize: result?.newSize,
+                  ratio: result?.ratio,
+                  err: result?.err,
+                });
               }
-            });
+            );
           })
           .catch((err) => {
             vscode.window.showInformationMessage(
@@ -102,20 +130,67 @@ export const disposable = vscode.commands.registerCommand(
           vscode.window.showInformationMessage(
             `Compressing... dir: ${targetFilePath}`
           );
-          compressImg(targetFilePath).then((result) => {
-            if (result?.type === "success") {
-              const msg = `Compressed [${
-                result?.imageUrl
-              }] completed: Old Size ${ByteSize(
-                result?.oldSize
-              )}, New Size ${ByteSize(result?.newSize)}, Optimization Ratio ${
-                result?.ratio
-              }`;
-              vscode.window.showInformationMessage(msg);
-            } else {
-              const msg = `Compressed [${result?.imageUrl}] failed: ${result?.err}`;
-              vscode.window.showErrorMessage(msg);
-            }
+          compressImg(targetFilePath, ECompressType.Cover).then((result) => {
+            messageShower({
+              type: result?.type,
+              imageUrl: result?.imageUrl,
+              oldSize: result?.oldSize,
+              newSize: result?.newSize,
+              ratio: result?.ratio,
+              err: result?.err,
+            });
+          });
+        } else {
+          vscode.window.showErrorMessage("Sorry. This file is not a img file.");
+        }
+      });
+  }
+);
+
+export const compressAndCreateDisposable = vscode.commands.registerCommand(
+  "ieg-vscode-compress-plugin.compressAndCreate",
+  (e) => {
+    const targetFilePath = e.path;
+    fs.ensureDir(targetFilePath)
+      .then(() => {
+        fs.readdir(targetFilePath)
+          .then((data) => {
+            vscode.window.showInformationMessage(
+              `Compressing... dir: ${targetFilePath}`
+            );
+            compressImgList(data, targetFilePath, ECompressType.Create).then(
+              (result) => {
+                messageShower({
+                  type: result?.type,
+                  imageUrl: result?.imageUrl,
+                  oldSize: result?.oldSize,
+                  newSize: result?.newSize,
+                  ratio: result?.ratio,
+                  err: result?.err,
+                });
+              }
+            );
+          })
+          .catch((err) => {
+            vscode.window.showInformationMessage(
+              `Compressed [${targetFilePath}] failed: ${err}`
+            );
+          });
+      })
+      .catch(() => {
+        if (isImgFile(targetFilePath)) {
+          vscode.window.showInformationMessage(
+            `Compressing... dir: ${targetFilePath}`
+          );
+          compressImg(targetFilePath, ECompressType.Create).then((result) => {
+            messageShower({
+              type: result?.type,
+              imageUrl: result?.imageUrl,
+              oldSize: result?.oldSize,
+              newSize: result?.newSize,
+              ratio: result?.ratio,
+              err: result?.err,
+            });
           });
         } else {
           vscode.window.showErrorMessage("Sorry. This file is not a img file.");

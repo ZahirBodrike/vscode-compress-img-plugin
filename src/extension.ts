@@ -1,9 +1,13 @@
 import * as vscode from "vscode";
-import { disposable } from "./index";
+import {
+  compressAndCoverDisposable,
+  compressAndCreateDisposable,
+} from "./index";
 
 export function activate(context: vscode.ExtensionContext) {
   try {
-    context.subscriptions.push(disposable);
+    context.subscriptions.push(compressAndCoverDisposable);
+    context.subscriptions.push(compressAndCreateDisposable);
   } catch (err) {
     console.log(err);
   }
