@@ -1,9 +1,6 @@
 import * as Https from "https";
 import * as Url from "url";
-import * as Fs from "fs-extra";
-import * as vscode from "vscode";
-
-import { RandomNum, ByteSize, RoundNum, isImgFile } from "./util/tool";
+import { RandomNum } from "./util/tool";
 
 const TINYIMG_URL = ["tinyjpg.com", "tinypng.com"];
 
@@ -29,7 +26,7 @@ function RandomHeader() {
   };
 }
 
-function UploadImg(file) {
+function uploadImg(file) {
   const opts = RandomHeader();
   return new Promise((resolve, reject) => {
     const req = Https.request(opts, (res) =>
@@ -44,7 +41,7 @@ function UploadImg(file) {
   });
 }
 
-function DownloadImg(url) {
+function downloadImg(url) {
   const opts = new Url.URL(url);
   return new Promise((resolve, reject) => {
     const req = Https.request(opts, (res) => {
@@ -58,37 +55,7 @@ function DownloadImg(url) {
   });
 }
 
-export async function CompressImg(imageUrl) {
-  try {
-    const file = await Fs.readFile(`${imageUrl}`);
-    const obj: any = await UploadImg(file);
-    const data: any = await DownloadImg(obj.output.url);
-    const oldSize = ByteSize(obj.input.size);
-    const newSize = ByteSize(obj.output.size);
-    const ratio = RoundNum(1 - obj.output.ratio, 2, true);
-    const msg = `Compressed [${imageUrl}] completed: Old Size ${oldSize}, New Size ${newSize}, Optimization Ratio ${ratio}`;
-    Fs.writeFileSync(`${imageUrl}`, data, "binary");
-    return Promise.resolve({ type: "success", msg });
-  } catch (err) {
-    const msg = `Compressed [${imageUrl}] failed: ${err}`;
-    return Promise.resolve({ type: "fail", msg });
-  }
-}
-
-export const compressImgList = async (files: string[], filePath) => {
-  // 只过滤img
-  const beforeCompressImages = files.filter((file) => isImgFile(file));
-  if (!beforeCompressImages || beforeCompressImages.length <= 0) {
-    vscode.window.showErrorMessage("Unprocessed image list is empty.");
-    return;
-  }
-  for (let index = 0; index < beforeCompressImages.length; index++) {
-    const { type, msg } = await CompressImg(
-      `${filePath}/${beforeCompressImages[index]}`
-    );
-    console.log(msg);
-    if (type === "fail") {
-      vscode.window.showErrorMessage(msg);
-    }
-  }
+export default {
+  uploadImg,
+  downloadImg,
 };
