@@ -1,6 +1,9 @@
 import * as Https from "https";
 import * as Url from "url";
-import { RandomNum } from "./util/tool";
+import * as fs from "fs-extra";
+import * as vscode from "vscode";
+import { RandomNum, RoundNum, isImgFile } from "./util/tool";
+import { ECompressType } from "./index";
 
 const TINYIMG_URL = ["tinyjpg.com", "tinypng.com"];
 
@@ -55,7 +58,82 @@ function downloadImg(url) {
   });
 }
 
+async function compressImg(imageUrl: string, type: ECompressType) {
+  try {
+    const file = await fs.readFile(`${imageUrl}`);
+    const obj: any = await uploadImg(file);
+    const data: any = await downloadImg(obj.output.url);
+    const oldSize = obj.input.size;
+    const newSize = obj.output.size;
+    const ratio = RoundNum(1 - obj.output.ratio, 2, true);
+    if (type === ECompressType.Cover) {
+      fs.writeFileSync(`${imageUrl}`, data, "binary");
+    } else if (type === ECompressType.Create) {
+      const now = Date.now();
+      const oldImgName = imageUrl.replace(".", `_old_${now}.`);
+      fs.rename(imageUrl, oldImgName).then(() => {
+        fs.writeFileSync(`${imageUrl}`, data, "binary");
+      });
+    }
+
+    return {
+      type: "success",
+      imageUrl,
+      oldSize,
+      newSize,
+      ratio,
+      err: undefined,
+    };
+  } catch (err) {
+    return { type: "fail", imageUrl, oldSize: 0, newSize: 0, ratio: 0, err };
+  }
+}
+
+const compressImgList = async (
+  files: string[],
+  filePath,
+  compressType: ECompressType
+) => {
+  // 只过滤img
+  try {
+    const beforeCompressImages = files.filter((file) => isImgFile(file));
+    if (!beforeCompressImages || beforeCompressImages.length <= 0) {
+      vscode.window.showErrorMessage("Unprocessed image list is empty.");
+      return;
+    }
+    let totalOldSize = 0;
+    let totalNewSize = 0;
+    for (let index = 0; index < beforeCompressImages.length; index++) {
+      const { type, oldSize, newSize } = await compressImg(
+        `${filePath}/${beforeCompressImages[index]}`,
+        compressType
+      );
+      if (type === "success") {
+        totalOldSize += oldSize;
+        totalNewSize += newSize;
+      }
+    }
+    return {
+      type: "success",
+      imageUrl: filePath,
+      oldSize: totalOldSize,
+      newSize: totalNewSize,
+      ratio: RoundNum(1 - totalNewSize / totalOldSize, 2, true),
+      err: undefined,
+    };
+  } catch (err) {
+    return {
+      type: "fail",
+      imageUrl: filePath,
+      oldSize: 0,
+      newSize: 0,
+      ratio: 0,
+      err,
+    };
+  }
+};
+
 export default {
-  uploadImg,
-  downloadImg,
+  compressImg,
+  compressImgList,
 };

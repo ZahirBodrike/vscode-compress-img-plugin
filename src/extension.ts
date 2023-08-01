@@ -1,8 +1,6 @@
 import * as vscode from "vscode";
-import {
-  compressAndCoverDisposable,
-  compressAndCreateDisposable,
-} from "./index";
+import { compressAndCoverDisposable } from "./disposable/compressAndCover";
+import { compressAndCreateDisposable } from "./disposable/compressAndCreate";
 
 export function activate(context: vscode.ExtensionContext) {
   try {
