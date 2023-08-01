@@ -1,7 +1,7 @@
 {
   "name": "ieg-vscode-plugin",
   "displayName": "ieg-vscode-plugin",
-  "icon": "https://16163.com/favicon.ico",
+  "icon": "favicon.ico",
   "description": "",
   "publisher": "zhangbin",
   "version": "1.0.0",
