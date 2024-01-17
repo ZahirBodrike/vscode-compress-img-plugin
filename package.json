@@ -1,6 +1,6 @@
 {
-  "name": "ieg-vscode-compress-plugin",
-  "displayName": "ieg-vscode-compress-plugin",
+  "name": "ieg-vscode-plugin",
+  "displayName": "ieg-vscode-plugin",
   "icon": "favicon.ico",
   "description": "",
   "publisher": "zhangbin",
@@ -12,28 +12,36 @@
     "Other"
   ],
   "activationEvents": [
-    "onCommand:ieg-vscode-compress-plugin.helloWorld"
+    "onCommand:ieg-vscode-plugin.helloWorld"
   ],
   "main": "./dist/extension.js",
   "contributes": {
     "commands": [
       {
-        "command": "ieg-vscode-compress-plugin.compressAndCover",
+        "command": "ieg-vscode-plugin.compressAndCover",
         "title": "ieg - 压缩图片(覆盖原文件)"
       },
       {
-        "command": "ieg-vscode-compress-plugin.compressAndCreate",
+        "command": "ieg-vscode-plugin.compressAndCreate",
         "title": "ieg - 压缩图片(保留原文件)"
+      },
+      {
+        "command": "ieg-vscode-plugin.uploadImg",
+        "title": "ieg - 上传图片"
       }
     ],
     "menus": {
       "explorer/context": [
         {
-          "command": "ieg-vscode-compress-plugin.compressAndCover",
+          "command": "ieg-vscode-plugin.compressAndCover",
           "group": "ieg-utils"
         },
         {
-          "command": "ieg-vscode-compress-plugin.compressAndCreate",
+          "command": "ieg-vscode-plugin.compressAndCreate",
+          "group": "ieg-utils"
+        },
+        {
+          "command": "ieg-vscode-plugin.uploadImg",
           "group": "ieg-utils"
         }
       ]
@@ -52,9 +60,6 @@
     "build": "vsce package"
   },
   "dependencies": {
-    "chalk": "^5.2.0",
-    "figures": "^5.0.0",
-    "fs-extra": "^11.1.0",
     "@types/fs-extra": "^11.0.1",
     "@types/glob": "^8.0.1",
     "@types/mocha": "^10.0.1",
@@ -63,7 +68,11 @@
     "@typescript-eslint/eslint-plugin": "^5.49.0",
     "@typescript-eslint/parser": "^5.49.0",
     "@vscode/test-electron": "^2.2.2",
+    "axios": "^1.6.5",
+    "chalk": "^5.2.0",
     "eslint": "^8.33.0",
+    "figures": "^5.0.0",
+    "fs-extra": "^11.1.0",
     "glob": "^8.1.0",
     "mocha": "^10.1.0",
     "ts-loader": "^9.4.2",

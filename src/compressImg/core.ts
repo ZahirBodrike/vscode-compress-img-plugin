@@ -2,8 +2,8 @@ import * as Https from "https";
 import * as Url from "url";
 import * as fs from "fs-extra";
 import * as vscode from "vscode";
-import { RandomNum, RoundNum, isImgFile } from "./util/tool";
-import { ECompressType } from "./index";
+import { RandomNum, RoundNum, isImgFile } from "../util/tool";
+import { ECompressType } from "./base";
 
 const TINYIMG_URL = ["tinyjpg.com", "tinypng.com"];
 

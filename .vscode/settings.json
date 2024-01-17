@@ -21,8 +21,8 @@
   "stylelint.validate": ["css", "scss", "less"],
   // 开启保存时自动格式化的语言类型
   "editor.codeActionsOnSave": {
-    "source.fixAll.eslint": true,
-    "source.fixAll.stylelint": true
+    "source.fixAll.eslint": "explicit",
+    "source.fixAll.stylelint": "explicit"
   },
   // 编辑器默认格式化的插件
   "editor.defaultFormatter": "esbenp.prettier-vscode",

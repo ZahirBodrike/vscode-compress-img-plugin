@@ -1,4 +1,4 @@
-# ieg-vscode-compress-plugin 使用指南
+# ieg-vscode-plugin 使用指南
 
 vscode version: `1.75.0`以上
 

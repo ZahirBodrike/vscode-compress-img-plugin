@@ -1,7 +1,7 @@
 import * as fs from "fs-extra";
 import * as vscode from "vscode";
 import core from "./core";
-import { ByteSize, isImgFile } from "./util/tool";
+import { ByteSize, isImgFile } from "../util/tool";
 
 export enum ECompressType {
   Cover,
